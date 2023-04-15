@@ -2,7 +2,7 @@ import subprocess
 import os.path
 import glob
 
-PROGRAM = 'problem1'
+PROBLEM = 3
 TEAM = 1
 
 # paths are expected to be absolute
@@ -13,13 +13,14 @@ OUTPUT_PATH = '/Users/jh/Developer/SoutheastCon2023/output'
 
 
 def main():
-    language, program = findProgrammingLanguage(PROGRAM, PROGRAMS_PATH)
+    program_name = 'problem'+str(PROBLEM)
+    language, program = findProgrammingLanguage(program_name, PROGRAMS_PATH)
     if language.compile_command is not None:
         print('Compiling ' + language.name + ' program ' + program)
         program = language.compile_program(program, OUTPUT_PATH)
-        language.run_program(program, INPUTS_PATH, OUTPUT_PATH)
+        language.run_program(PROBLEM, program, INPUTS_PATH, OUTPUT_PATH)
     else:
-        language.run_program(program, INPUTS_PATH, OUTPUT_PATH)
+        language.run_program(PROBLEM, program, INPUTS_PATH, OUTPUT_PATH)
 
 
 class ProgrammingLanguage:
@@ -54,8 +55,9 @@ class CPP(ProgrammingLanguage):
         output = subprocess.run(command, capture_output=True, check=True)
         return output_file_name
 
-    def run_program(filename, input_path, output_path):
-        files = glob.glob('input_*.txt', root_dir=input_path)
+    def run_program(problem, filename, input_path, output_path):
+        globname = 'input_' + str(problem) + '*.txt'
+        files = glob.glob(globname, root_dir=input_path)
         path, file = os.path.split(filename)
         file_base_name = os.path.splitext(file)[0]
         output_file_name = os.path.join(output_path, file_base_name)
@@ -91,8 +93,9 @@ class Java(ProgrammingLanguage):
         output = subprocess.run(command, capture_output=True, check=True)
         return output_file_name+'.class'
 
-    def run_program(filename, input_path, output_path):
-        files = glob.glob('input_*.txt', root_dir=input_path)
+    def run_program(problem, filename, input_path, output_path):
+        globname = 'input_' + str(problem) + '*.txt'
+        files = glob.glob(globname, root_dir=input_path)
         path, file = os.path.split(filename)
         file_base_name = os.path.splitext(file)[0]
         output_file_name = os.path.join(output_path, file_base_name)
@@ -114,8 +117,9 @@ class Python(ProgrammingLanguage):
     extension = 'py'
     run_command = 'python3'
 
-    def run_program(filename, input_path, output_path):
-        files = glob.glob('input_*.txt', root_dir=input_path)
+    def run_program(problem, filename, input_path, output_path):
+        globname = 'input_' + str(problem) + '*.txt'
+        files = glob.glob(globname, root_dir=input_path)
         path, file = os.path.split(filename)
         file_base_name = os.path.splitext(file)[0]
         output_file_name = os.path.join(output_path, file_base_name)
@@ -131,7 +135,7 @@ class Python(ProgrammingLanguage):
                                         stdout=out_f)
 
 
-PROGRAMMING_LANGUAGES = [Java]
+PROGRAMMING_LANGUAGES = [Python, Java, CPP]
 
 
 def findProgrammingLanguage(filename, path):
